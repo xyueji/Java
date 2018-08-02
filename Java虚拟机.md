@@ -158,9 +158,7 @@ Minor GC（新生代回收）的触发条件比较简单，Eden空间不足就�
 # Java内存溢出(OOM)异常完全指南
 ## 1.java.lang.OutOfMemoryError:Java heap space
 Java应用程序在启动时会指定所需要的内存大小，它被分割成两个不同的区域：Heap space（堆空间）和Permgen（永久代）：
-<div align=center>
-![]("img/175724-a68519533d59996e.png")
-</div>
+<center><img src="img/175724-a68519533d59996e.png"></center>
 这两个区域的大小可以在JVM（Java虚拟机）启动时通过参数-Xmx和-XX:MaxPermSize设置，如果你没有显式设置，则将使用特定平台的默认值。<br>
 当应用程序试图向堆空间添加更多的数据，但堆却没有足够的空间来容纳这些数据时，将会触发java.lang.OutOfMemoryError: Java heap space异常。需要注意的是：即使有足够的物理内存可用，只要达到堆空间设置的大小限制，此异常仍然会被触发。<br>
 ### 原因分析
