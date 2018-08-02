@@ -158,7 +158,9 @@ Minor GC（新生代回收）的触发条件比较简单，Eden空间不足就�
 # Java内存溢出(OOM)异常完全指南
 ## 1.java.lang.OutOfMemoryError:Java heap space
 Java应用程序在启动时会指定所需要的内存大小，它被分割成两个不同的区域：Heap space（堆空间）和Permgen（永久代）：
-<img src="img/175724-a68519533d59996e.png">
+<div align=center>
+![](img/175724-a68519533d59996e.png)
+</div>
 这两个区域的大小可以在JVM（Java虚拟机）启动时通过参数-Xmx和-XX:MaxPermSize设置，如果你没有显式设置，则将使用特定平台的默认值。<br>
 当应用程序试图向堆空间添加更多的数据，但堆却没有足够的空间来容纳这些数据时，将会触发java.lang.OutOfMemoryError: Java heap space异常。需要注意的是：即使有足够的物理内存可用，只要达到堆空间设置的大小限制，此异常仍然会被触发。<br>
 ### 原因分析
@@ -173,7 +175,7 @@ Java应用程序只需要开发者分配内存，每当在内存中特定的空�
 java.lang.OutOfMemoryError:GC overhead limit exceeded错误是一个信号，示意你的应用程序在垃圾收集上花费了太多时间但却没有什么卵用。默认超过98%的时间用来做GC却回收了不到2%的内存时将会抛出此错误。那如果没有此限制会发生什么呢？GC进程将被重启，100%的CPU将用于GC，而没有CPU资源用于其他正常的工作。如果一个工作本来只需要几毫秒即可完成，现在却需要几分钟才能完成，我想这种结果谁都没有办法接受。
 ## 3.java.lang.OutOfMemoryError:Permgen space
 Java中堆空间是JVM管理的最大一块内存空间，可以在JVM启动时指定堆空间的大小，其中堆被划分成两个不同的区域：新生代（Young）和老年代（Tenured），新生代又被划分为3个区域：Eden、From Survivor、To Survivor，如下图所示。
-<img src="175724-5db7eb45195165ac.jpg">
+<img src="img/175724-5db7eb45195165ac.jpg">
 java.lang.OutOfMemoryError: PermGen space错误就表明持久代所在区域的内存已被耗尽。
 ### 原因分析
 要理解java.lang.OutOfMemoryError: PermGen space出现的原因，首先需要理解Permanent Generation Space的用处是什么。持久代主要存储的是每个类的信息，比如：类加载器引用、运行时常量池（所有常量、字段引用、方法引用、属性）、字段(Field)数据、方法(Method)数据、方法代码、方法字节码等等。我们可以推断出，PermGen的大小取决于被加载类的数量以及类的大小。
