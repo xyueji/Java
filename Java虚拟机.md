@@ -158,7 +158,7 @@ Minor GC（新生代回收）的触发条件比较简单，Eden空间不足就�
 # Java内存溢出(OOM)异常完全指南
 ## 1.java.lang.OutOfMemoryError:Java heap space
 Java应用程序在启动时会指定所需要的内存大小，它被分割成两个不同的区域：Heap space（堆空间）和Permgen（永久代）：
-<div align="center"><img src="img/175724-a68519533d59996e.png"></div><br>
+<div align="center"><img src="img/175724-a68519533d59996e.png"/></div><br>
 这两个区域的大小可以在JVM（Java虚拟机）启动时通过参数-Xmx和-XX:MaxPermSize设置，如果你没有显式设置，则将使用特定平台的默认值。<br>
 当应用程序试图向堆空间添加更多的数据，但堆却没有足够的空间来容纳这些数据时，将会触发java.lang.OutOfMemoryError: Java heap space异常。需要注意的是：即使有足够的物理内存可用，只要达到堆空间设置的大小限制，此异常仍然会被触发。<br>
 ### 原因分析
@@ -173,7 +173,7 @@ Java应用程序只需要开发者分配内存，每当在内存中特定的空�
 java.lang.OutOfMemoryError:GC overhead limit exceeded错误是一个信号，示意你的应用程序在垃圾收集上花费了太多时间但却没有什么卵用。默认超过98%的时间用来做GC却回收了不到2%的内存时将会抛出此错误。那如果没有此限制会发生什么呢？GC进程将被重启，100%的CPU将用于GC，而没有CPU资源用于其他正常的工作。如果一个工作本来只需要几毫秒即可完成，现在却需要几分钟才能完成，我想这种结果谁都没有办法接受。
 ## 3.java.lang.OutOfMemoryError:Permgen space
 Java中堆空间是JVM管理的最大一块内存空间，可以在JVM启动时指定堆空间的大小，其中堆被划分成两个不同的区域：新生代（Young）和老年代（Tenured），新生代又被划分为3个区域：Eden、From Survivor、To Survivor，如下图所示。
-<div align="center"><img src="175724-5db7eb45195165ac.jpg"></div><br>
+<div align="center"><img src="img/175724-5db7eb45195165ac.jpg"/></div><br>
 java.lang.OutOfMemoryError: PermGen space错误就表明持久代所在区域的内存已被耗尽。
 ### 原因分析
 要理解java.lang.OutOfMemoryError: PermGen space出现的原因，首先需要理解Permanent Generation Space的用处是什么。持久代主要存储的是每个类的信息，比如：类加载器引用、运行时常量池（所有常量、字段引用、方法引用、属性）、字段(Field)数据、方法(Method)数据、方法代码、方法字节码等等。我们可以推断出，PermGen的大小取决于被加载类的数量以及类的大小。
@@ -181,7 +181,7 @@ java.lang.OutOfMemoryError: PermGen space错误就表明持久代所在区域的
 因此，我们可以得出出现java.lang.OutOfMemoryError: PermGen space错误的原因是：太多的类或者太大的类被加载到permanent generation（持久代）。
 ## 4.java.lang.OutOfMemoryError:Metaspace
 PermGen区域用于存储类的名称和字段，类的方法，方法的字节码，常量池，JIT优化等，但从Java8开始，Java中的内存模型发生了重大变化：引入了称为Metaspace的新内存区域，而删除了PermGen区域。请注意：不是简单的将PermGen区所存储的内容直接移到Metaspace区，PermGen区中的某些部分，已经移动到了普通堆里面。
-<div align="center"><img src="img/175724-d66356d217ab3b45.png"></div><br>
+<div align="center"><img src="img/175724-d66356d217ab3b45.png"/></div><br>
 ### 原因分析
 Java8做出如此改变的原因包括但不限于：
 * 应用程序所需要的PermGen区大小很难预测，设置太小会触发PermGen OutOfMemoryError错误，过度设置导致资源浪费。
@@ -190,7 +190,7 @@ Java8做出如此改变的原因包括但不限于：
 正如你所看到的，元空间大小的要求取决于加载的类的数量以及这种类声明的大小。 所以很容易看到java.lang.OutOfMemoryError: Metaspace主要原因：太多的类或太大的类加载到元空间。
 ## 5.java.lang.OutOfMemoryError:Unable to create new native thread
 一个思考线程的方法是将线程看着是执行任务的工人，如果你只有一个工人，那么他同时只能执行一项任务，但如果你有十几个工人，就可以同时完成你几个任务。就像这些工人都在物理世界，JVM中的线程完成自己的工作也是需要一些空间的，当有足够多的线程却没有那么多的空间时就会像这样：
-<div align="center"><img src="img/175724-2328d70ae5fbf81b.png"></div><br>
+<div align="center"><img src="img/175724-2328d70ae5fbf81b.png"/></div><br>
 出现java.lang.OutOfMemoryError:Unable to create new native thread就意味着Java应用程序已达到其可以启动线程数量的极限了。
 ### 原因分析
 当JVM向OS请求创建一个新线程时，而OS却无法创建新的native线程时就会抛出Unable to create new native thread错误。一台服务器可以创建的线程数依赖于物理配置和平台，建议运行下文中的示例代码来测试找出这些限制。总体上来说，抛出此错误会经过以下几个阶段：
@@ -201,7 +201,7 @@ Java8做出如此改变的原因包括但不限于：
 * Unable to create new native thread错误将被抛出
 ## 6.java.lang.OutOfMemoryError:Out of swap space?
 Java应用程序在启动时会指定所需要的内存大小，可以通过-Xmx和其他类似的启动参数来指定。在JVM请求的总内存大于可用物理内存的情况下，操作系统会将内存中的数据交换到磁盘上去。
-<div align="center"><img src="img/175724-046c38316deb5116.png"></div><br>
+<div align="center"><img src="img/175724-046c38316deb5116.png"/></div><br>
 Out of swap space?表示交换空间也将耗尽，并且由于缺少物理内存和交换空间，再次尝试分配内存也将失败。
 ### 原因分析
 java.lang.OutOfMemoryError:Out of swap space?往往是由操作系统级别的问题引起的，例如：
@@ -213,9 +213,11 @@ Java对应用程序可以分配的最大数组大小有限制。不同平台限�
 当你遇到Requested array size exceeds VM limit错误时，意味着你的应用程序试图分配大于Java虚拟机可以支持的数组。
 ## 8.Out of memory:Kill process or sacrifice child
 为了理解这个错误，我们需要补充一点操作系统的基础知识。操作系统是建立在进程的概念之上，这些进程在内核中作业，其中有一个非常特殊的进程，名叫“内存杀手（Out of memory killer）”。当内核检测到系统内存不足时，OOM killer被激活，然后选择一个进程杀掉。哪一个进程这么倒霉呢？选择的算法和想法都很朴实：谁占用内存最多，谁就被干掉。
-<div align="center"><img src="img/175724-e7ea60017e7b2a1c.png"></div><br>
+<div align="center"><img src="img/175724-e7ea60017e7b2a1c.png"/></div><br>
 当可用虚拟虚拟内存(包括交换空间)消耗到让整个操作系统面临风险时，就会产生Out of memory:Kill process or sacrifice child错误。在这种情况下，OOM Killer会选择“流氓进程”并杀死它。
 ### 原因分析
 默认情况下，Linux内核允许进程请求比系统中可用内存更多的内存，但大多数进程实际上并没有使用完他们所分配的内存。这就跟现实生活中的宽带运营商类似，他们向所有消费者出售一个100M的带宽，远远超过用户实际使用的带宽，一个10G的链路可以非常轻松的服务100个(10G/100M)用户，但实际上宽带运行商往往会把10G链路用于服务150人或者更多，以便让链路的利用率更高，毕竟空闲在那儿也没什么意义。<br>
 Linux内核采用的机制跟宽带运营商差不多，一般情况下都没有问题，但当大多数应用程序都消耗完自己的内存时，麻烦就来了，因为这些应用程序的内存需求加起来超出了物理内存（包括 swap）的容量，内核（OOM killer）必须杀掉一些进程才能腾出空间保障系统正常运行。就如同上面的例子中，如果150人都占用100M的带宽，那么总的带宽肯定超过了10G这条链路能承受的范围。
-## [转自：Java内存溢出(OOM)异常完全指南--简书](https://www.jianshu.com/p/2fdee831ed03)
+<br>
+<br>
+[转自：Java内存溢出(OOM)异常完全指南--简书](https://www.jianshu.com/p/2fdee831ed03)
